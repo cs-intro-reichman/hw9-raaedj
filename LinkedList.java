@@ -50,12 +50,15 @@ public class LinkedList {
 	 * @return the node at the given index
 	 */		
 	public Node getNode(int index) {
-		if (index < 0 || index > size) {
+		if (index < 0 || index > size || size == 0) {
 			throw new IllegalArgumentException(
 					"index must be between 0 and size");
 		}
-		//// Replace the following statement with your code
-		return null;
+		ListIterator itr = iterator();
+		for (int i = 0; i < index; i++){
+			itr.next();
+		}
+		return itr.current;
 	}
 	
 	/**
@@ -78,7 +81,29 @@ public class LinkedList {
 	 *         if index is negative or greater than the list's size
 	 */
 	public void add(int index, MemoryBlock block) {
-		//// Write your code here
+		if (index > size){
+			return;
+		}
+		if (index == 0){
+			addFirst(block);
+			if (index == size){
+				addLast(block);
+				size--; // it is being increased twice
+			}
+		}
+		else if (index == size){
+			addLast(block);
+		}
+		else{
+			Node mem = new Node(block);
+			ListIterator itr = iterator();
+			for (int i = 0; i < index - 1; i++){
+				itr.next();
+			}
+			mem.next = itr.current.next;
+			itr.current.next = mem;
+			size++;
+		}		
 	}
 
 	/**
@@ -89,7 +114,16 @@ public class LinkedList {
 	 *        the given memory block
 	 */
 	public void addLast(MemoryBlock block) {
-		//// Write your code here
+		Node mem = new Node(block);
+		if (last != null){
+			last.next = mem;
+			last = mem;
+		}
+		else{
+			last = mem;
+			first = mem;
+		}
+		size++;
 	}
 	
 	/**
@@ -100,7 +134,17 @@ public class LinkedList {
 	 *        the given memory block
 	 */
 	public void addFirst(MemoryBlock block) {
-		//// Write your code here
+		Node mem = new Node(block);
+		if (first != null){
+			mem.next = first;
+			first = mem;
+		}
+		else{
+			first = mem;
+			last = mem;
+		}
+		
+		size++;
 	}
 
 	/**
@@ -113,8 +157,13 @@ public class LinkedList {
 	 *         if index is negative or greater than or equal to size
 	 */
 	public MemoryBlock getBlock(int index) {
-		//// Replace the following statement with your code
-		return null;
+		Node temp = getNode(index);
+		if (temp != null){
+			return temp.block;
+		}
+		else{
+			return null;
+		}
 	}	
 
 	/**
@@ -125,7 +174,13 @@ public class LinkedList {
 	 * @return the index of the block, or -1 if the block is not in this list
 	 */
 	public int indexOf(MemoryBlock block) {
-		//// Replace the following statement with your code
+		ListIterator itr = iterator();
+		for (int i = 0; i < size; i++){
+			if (block.equals(itr.current.block)){
+				return i;
+			}
+			itr.next();
+		}
 		return -1;
 	}
 
@@ -136,7 +191,33 @@ public class LinkedList {
 	 *        the node that will be removed from this list
 	 */
 	public void remove(Node node) {
-		//// Write your code here
+		if (node == null){
+			throw new NullPointerException(
+					" NullPointerException!");
+		}
+		if (node.equals(first)){
+			first = first.next;
+			if (first == null){
+				last = null;
+			}
+		}
+		else if (node.equals(last)){
+			last = getNode(size - 2);
+			getNode(size - 2).next = null;
+			if (size - 1 == 1){
+				first = last;
+			}
+		}
+		else{
+			ListIterator itr = iterator();
+			for (int i = 0; i < size - 2; i++){
+				if (itr.current.next.equals(node)){
+					itr.current.next = node.next;
+				}
+				itr.next();
+			}
+		}		
+		size--;
 	}
 
 	/**
@@ -147,7 +228,7 @@ public class LinkedList {
 	 *         if index is negative or greater than or equal to size
 	 */
 	public void remove(int index) {
-		//// Write your code here
+		remove(getNode(index));
 	}
 
 	/**
@@ -158,7 +239,7 @@ public class LinkedList {
 	 *         if the given memory block is not in this list
 	 */
 	public void remove(MemoryBlock block) {
-		//// Write your code here
+		remove(getNode(indexOf(block)));
 	}	
 
 	/**
@@ -172,7 +253,18 @@ public class LinkedList {
 	 * A textual representation of this list, for debugging.
 	 */
 	public String toString() {
-		//// Replace the following statement with your code
-		return "";
+		String s = "";
+		ListIterator itr = iterator();
+		for (int i = 0; i < size; i++){
+			s += itr.current.block.toString() + " ";
+			if (itr.hasNext()){
+				itr.next();
+			}
+			else{   // means there is an error
+				System.out.println("error printing list:");
+				return s;
+			}
+		}
+		return s;
 	}
 }
